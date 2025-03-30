@@ -1,0 +1,36 @@
+name: CI
+
+on: pull_request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.13]
+    steps:
+
+      # checkout, python 환경 구성
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Poetry 설치 및 구성
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      # 의존성 설치 (poetry)
+      - name: Install dependencies
+        run: |
+          poetry install --no-interaction --no-root
+
+      # 테스트 수행
+      - name: Test with pytest
+        run: |
+          poetry run pytest
